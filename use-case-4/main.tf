@@ -28,9 +28,6 @@ module "alb" {
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
 
-  # You CANNOT reference EC2 instance_id here directly — that causes a dependency cycle.
-  # So instead, configure the ALB target group to use tags or simpler attachment logic
-  # OR restructure this if absolutely needed.
 }
 
 module "security_group" {
