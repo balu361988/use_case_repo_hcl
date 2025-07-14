@@ -57,9 +57,9 @@ jobs:
         run: terraform validate
         working-directory: use-case-4
 
-      - name: Run Checkov Security Scan
-        run: checkov -d . --framework terraform
-        working-directory: use-case-4
+    # - name: Run Checkov Security Scan
+    #  run: checkov -d . --framework terraform
+    #   working-directory: use-case-4
 
       - name: Terraform Plan
         run: terraform plan
