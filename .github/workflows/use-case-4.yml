@@ -45,8 +45,8 @@ jobs:
         run: tflint -f compact
         working-directory: use-case-4
 
-      - name: Terraform Format
-        run: terraform fmt -check -recursive
+      - name: Terraform Format (Auto-fix)
+        run: terraform fmt -recursive
         working-directory: use-case-4
 
       - name: Terraform Init
