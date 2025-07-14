@@ -43,28 +43,10 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Generate Terraform Documentation
-        uses: terraform-docs/gh-actions@v1.4.1
-        with:
-          working-dir: .
-          output-file: README.md
-          output-method: inject
-          output-format: markdown
-          indention: 2
-          git-push: false  # We'll handle git manually
-
       - name: Set up Git
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-
-      - name: Pull latest changes with rebase
-        run: git pull origin main --rebase
-
-      - name: Commit README changes
-        run: |
-          git add README.md
-          git commit -m "docs: Update Terraform documentation" || echo "No changes to commit"
 
       - name: Push changes
         env:
