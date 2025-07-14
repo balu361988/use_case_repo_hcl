@@ -1,28 +1,20 @@
-variable "project_name" {
-  type = string
-}
-
-variable "vpc_id" {
-  type = string
-}
-
-variable "subnet_id" {
-  type = string
-}
-
-variable "ami_id" {
-  type = string
-}
-
-variable "instance_type" {
-  type = string
-}
-
-variable "key_name" {
-  type = string
-}
-
-variable "security_group_id" {
+variable "env" {
+  description = "Environment name"
   type        = string
 }
 
+variable "public_subnet_ids" {
+  description = "List of public subnet IDs"
+  type        = list(string)
+}
+
+variable "web_sg_id" {
+  description = "Web security group ID"
+  type        = string
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t2.medium"
+}

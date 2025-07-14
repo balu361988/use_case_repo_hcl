@@ -1,12 +1,13 @@
-variable "project_name" {
-  type = string
+variable "subnet_ids" {
+  description = "List of subnet IDs for ALB"
+  type        = list(string)
 }
 
 variable "vpc_id" {
-  type = string
+  description = "VPC ID for ALB"
+  type        = string
 }
-
-variable "public_subnet_ids" {
-  type = list(string)
+variable "instance_a_id" {
+  description = "instance a id"
+  type        = string
 }
-

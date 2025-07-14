@@ -1,25 +1,24 @@
-variable "project_name" {
+variable "env" {
+  description = "Environment name"
   type        = string
-  description = "Project name for tagging resources"
 }
 
 variable "vpc_cidr" {
+  description = "VPC CIDR block"
   type        = string
-  description = "CIDR block for the VPC"
 }
 
-variable "public_subnet_cidrs" {
+variable "public_subnets" {
+  description = "List of public subnet CIDRs"
   type        = list(string)
-  description = "List of CIDRs for public subnets"
 }
 
-variable "private_subnet_cidrs" {
+variable "private_subnets" {
+  description = "List of private subnet CIDRs"
   type        = list(string)
-  description = "List of CIDRs for private subnets"
 }
 
-variable "azs" {
-  type        = list(string)
-  description = "Availability zones"
+variable "region" {
+  description = "AWS region"
+  type        = string
 }
-

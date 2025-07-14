@@ -1,40 +1,36 @@
-variable "project_name" {
+variable "env" {
+  description = "Environment name"
   type        = string
-  description = "Prefix for naming resources"
+  default     = "dev"
+}
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "vpc_cidr" {
+  description = "VPC CIDR block"
   type        = string
-  description = "CIDR for the VPC"
+  default     = "10.0.0.0/16"
 }
 
-variable "public_subnet_cidrs" {
-  type        = list(string)
+variable "public_subnets" {
   description = "List of public subnet CIDRs"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
-variable "private_subnet_cidrs" {
-  type        = list(string)
+variable "private_subnets" {
   description = "List of private subnet CIDRs"
-}
-
-variable "azs" {
   type        = list(string)
-  description = "Availability Zones"
+  default     = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
-variable "ami_id" {
-  type        = string
-  description = "AMI ID for the EC2 instance"
-}
 
 variable "instance_type" {
-  type        = string
   description = "EC2 instance type"
-}
-
-variable "key_name" {
   type        = string
-  description = "Key pair name for SSH access"
+  default     = "t2.large"
 }
-

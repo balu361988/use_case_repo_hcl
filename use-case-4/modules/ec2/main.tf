@@ -1,40 +1,20 @@
-resource "aws_instance" "devlake" {
-  ami                         = var.ami_id
-  instance_type               = "t2.medium"
-  subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = [aws_security_group.ec2_sg.id]  # ✅ FIXED
+resource "aws_instance" "web" {
+  count         = length(var.public_subnet_ids)
+  ami           = "ami-0321cd3e0040c7000"
+  instance_type = var.instance_type
+  subnet_id     = var.public_subnet_ids[count.index]
   associate_public_ip_address = true
-  key_name                    = var.key_name
+  vpc_security_group_ids      = [var.web_sg_id]
+
+  user_data = file("${path.module}/userdata.sh")
 
   root_block_device {
-    volume_size = 25
-    volume_type = "gp2"
+    volume_size           = 20
+    volume_type           = "gp2"
+    delete_on_termination = true
   }
-
-  user_data = file("${path.module}/user-data.sh")
 
   tags = {
-    Name = "devlake-ec2"
+    Name = "${var.env}-web-${count.index}"
   }
 }
-
-resource "aws_security_group" "ec2_sg" {
-  name        = "${var.project_name}-ec2-sg"
-  description = "Allow traffic from ALB"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-

@@ -1,38 +1,30 @@
-provider "aws" {
-  region = "ap-south-1"
-}
-
 module "vpc" {
-  source               = "./modules/vpc"
-  project_name         = var.project_name
-  vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-  azs                  = var.azs
-}
-
-module "ec2" {
-  source         = "./modules/ec2"
-  project_name   = var.project_name
-  vpc_id         = module.vpc.vpc_id
-  subnet_id      = module.vpc.public_subnet_ids[0]
-  ami_id         = var.ami_id
-  instance_type  = var.instance_type
-  key_name       = var.key_name
-  security_group_id  = module.security_group.ec2_sg_id
-}
-
-module "alb" {
-  source            = "./modules/alb"
-  project_name      = var.project_name
-  vpc_id            = module.vpc.vpc_id
-  public_subnet_ids = module.vpc.public_subnet_ids
-
+  source          = "./modules/vpc"
+  env             = var.env
+  vpc_cidr        = var.vpc_cidr
+  public_subnets  = var.public_subnets
+  private_subnets = var.private_subnets
+  region          = var.region
 }
 
 module "security_group" {
-  source = "./modules/security_group"
-  vpc_id = module.vpc.vpc_id
-  project_name  = var.project_name
+  source     = "./modules/security_group"
+  env        = var.env
+  vpc_id     = module.vpc.vpc_id
+}
+
+module "ec2" {
+  source            = "./modules/ec2"
+  env               = var.env
+  public_subnet_ids = module.vpc.public_subnet_ids
+  web_sg_id         = module.security_group.web_sg_id
+  instance_type     = var.instance_type
+}
+
+module "alb" {
+  source         = "./modules/alb"
+  subnet_ids     = module.vpc.public_subnet_ids
+  vpc_id         = module.vpc.vpc_id
+  instance_a_id  = module.ec2.instance_a_id[0]
 }
 
