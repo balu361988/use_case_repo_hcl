@@ -72,7 +72,8 @@ jobs:
           git-branch: "main"
           github-token: ${{ secrets.REPO_TOKEN }}
         
-      - name: Terraform Plan
+      - name: Terraform Plan 
+      
         run: terraform plan
 
       - name: Terraform Apply
