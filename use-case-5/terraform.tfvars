@@ -1,0 +1,6 @@
+source_bucket_name      = "image-hcl-apsouth1-upload-source"
+destination_bucket_name = "image-hcl-apsouth1-processed-destination"
+sns_topic_name          = "image-processing-updates"
+notification_email      = "mailkarthi90@gmail.com"
+lambda_function_name    = "image-processing-lambda"
+runtime                 = "python3.9"
