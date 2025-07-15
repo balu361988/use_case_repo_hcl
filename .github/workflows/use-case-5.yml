@@ -13,6 +13,9 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: use-case-5
     permissions:
       contents: write
       pull-requests: write
@@ -80,7 +83,7 @@ jobs:
           sudo mv conftest /usr/local/bin
 
       - name: Run OPA Policy Check with Conftest
-        working-directory: use-case-5
+        
         run: |
           terraform plan -out tfplan.binary
           terraform show -json tfplan.binary > tfplan.json
