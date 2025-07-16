@@ -21,6 +21,7 @@ jobs:
         working-directory: use-case-6
 
       
+      
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
         with:
@@ -30,7 +31,8 @@ jobs:
         run: |
           tflint --init
           tflint --recursive
-        working-directory: use-case-6
+        working-directory: use-case-
+
 
 
         
