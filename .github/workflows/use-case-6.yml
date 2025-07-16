@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'use-case-6/**'
-  workflow_dispatch:  # 👈 manual trigger enabled
+  workflow_dispatch:  
 
 permissions:
   id-token: write
