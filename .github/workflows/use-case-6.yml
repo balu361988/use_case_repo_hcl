@@ -46,8 +46,6 @@ jobs:
         run: terraform plan
 
 
-
-
         
 
      # - name: Install Checkov
