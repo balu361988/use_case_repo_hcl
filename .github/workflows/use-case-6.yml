@@ -1,0 +1,27 @@
+name: use-case-6
+
+on:
+  push:
+    paths:
+      - 'use-case-6/**'
+  pull_request:
+    paths:
+      - 'use-case-6/**' 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with: 
+          terraform_version: 1.6.6
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: use-case-6
+        
