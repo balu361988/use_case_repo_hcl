@@ -22,9 +22,10 @@ jobs:
 
       - name: Install TFLint
         run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash || echo "Fallback to apt"
-          sudo apt-get update && sudo apt-get install -y tflint
-
+          curl -L https://github.com/terraform-linters/tflint/releases/latest/download/tflint_linux_amd64.zip -o tflint.zip
+          unzip tflint.zip
+          sudo mv tflint /usr/local/bin/
+          tflint --version
 
       - name: Run TFLint
         run: tflint --recursive
