@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate Terraform Docs for EC2 module
         run: |
-          cd use-case-6/modules/ec2
+          cd modules/ec2
           terraform-docs markdown . > README.md
 
       - name: Debug - List files
