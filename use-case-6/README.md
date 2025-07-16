@@ -1,6 +1,6 @@
-# Terraform Documentation
+# Terraform Modules Documentation
 
-## Module: ec2
+## Module: ec2/
 ## Requirements
 
 No requirements.
@@ -35,9 +35,7 @@ No modules.
 |------|-------------|
 | <a name="output_instance_id"></a> [instance\_id](#output\_instance\_id) | n/a |
 
----
-
-## Module: lambda
+## Module: lambda/
 ## Requirements
 
 No requirements.
@@ -80,9 +78,7 @@ No modules.
 |------|-------------|
 | <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | n/a |
 
----
-
-## Module: scheduler
+## Module: scheduler/
 ## Requirements
 
 No requirements.
@@ -118,6 +114,3 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_event_rule_arn"></a> [event\_rule\_arn](#output\_event\_rule\_arn) | n/a |
-
----
-
