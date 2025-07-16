@@ -21,7 +21,10 @@ jobs:
         working-directory: use-case-6
 
       - name: Install TFLint
-        run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash || echo "Fallback to apt"
+          sudo apt-get update && sudo apt-get install -y tflint
+
 
       - name: Run TFLint
         run: tflint --recursive
