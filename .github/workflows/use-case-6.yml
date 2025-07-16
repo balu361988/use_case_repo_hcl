@@ -8,7 +8,7 @@ on:
 
 permissions:
   id-token: write
-  contents: write  # Needed for committing back
+  contents: write  # Required for committing generated docs
 
 jobs:
   terraform:
@@ -29,17 +29,20 @@ jobs:
           chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/
 
-      - name: Generate Terraform Docs for EC2 module
+      - name: Generate Terraform Docs for All Modules
         run: |
-          cd modules/ec2
-          terraform-docs markdown . > README.md
+          MODULES=$(find modules -type f -name main.tf -exec dirname {} \;)
+          for module in $MODULES; do
+            echo "📄 Generating docs for $module"
+            terraform-docs markdown "$module" > "$module/README.md"
+          done
 
-      - name: Commit updated Terraform Docs
+      - name: Commit All Terraform Docs
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git add modules/ec2/README.md
-          git commit -m "docs: update terraform-docs for EC2 module" || echo "No changes to commit"
+          git add modules/**/README.md
+          git commit -m "docs: update terraform-docs for all modules" || echo "No changes to commit"
           git push
 
       - name: Debug - List files
@@ -78,6 +81,7 @@ jobs:
       - name: Terraform Apply
         if: github.event_name == 'workflow_dispatch'
         run: terraform apply -auto-approve
+
 
 
  
