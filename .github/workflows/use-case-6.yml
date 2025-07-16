@@ -20,18 +20,16 @@ jobs:
         run: terraform fmt -recursive
         working-directory: use-case-6
 
-      
-      
-      - name: Setup TFLint
+      - name: Set up TFLint
         uses: terraform-linters/setup-tflint@v4
         with:
           tflint_version: latest
 
+      - name: Initialize TFLint
+        run: tflint --init
+
       - name: Run TFLint
-        run: |
-          tflint --init
-          tflint --recursive
-        working-directory: use-case-
+        run: tflint -f compact
 
 
 
