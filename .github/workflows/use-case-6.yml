@@ -32,6 +32,11 @@ jobs:
         with:
           tflint_version: latest
 
+      - name: Create TFLint Config
+        run: echo 'plugin "aws" { enabled = true region = "ap-south-1" }' > .tflint.hcl
+        working-directory: use-case-6
+
+
       - name: Run TFLint
         run: |
           echo 'plugin "aws" { enabled = true region = "ap-south-1" }' > use-case-6/.tflint.hcl
