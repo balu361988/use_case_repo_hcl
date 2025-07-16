@@ -1,20 +1,24 @@
-name: Terraform Plan & Apply
+name: Terraform - Use Case 6
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - 'use-case-6/**'
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: use-case-6
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Configure AWS credentials
@@ -29,7 +33,7 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Format
+      - name: Terraform Format Check
         run: terraform fmt -check
 
       - name: Terraform Validate
@@ -37,6 +41,7 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan
+
 
 
         
