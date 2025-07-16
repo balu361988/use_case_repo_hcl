@@ -1,12 +1,7 @@
 name: use-case-6
 
 on:
-  push:
-    paths:
-      - 'use-case-6/**'
-  pull_request:
-    paths:
-      - 'use-case-6/**' 
+  workflow_dispatch:
 
 jobs:
   build:
