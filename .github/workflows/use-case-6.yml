@@ -8,7 +8,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write  # Needed for committing back
 
 jobs:
   terraform:
@@ -33,6 +33,14 @@ jobs:
         run: |
           cd modules/ec2
           terraform-docs markdown . > README.md
+
+      - name: Commit updated Terraform Docs
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add modules/ec2/README.md
+          git commit -m "docs: update terraform-docs for EC2 module" || echo "No changes to commit"
+          git push
 
       - name: Debug - List files
         run: ls -R
@@ -67,12 +75,10 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
 
-      - name: Terraform Plan
-        run: terraform plan
-
       - name: Terraform Apply
         if: github.event_name == 'workflow_dispatch'
         run: terraform apply -auto-approve
+
 
  
 
