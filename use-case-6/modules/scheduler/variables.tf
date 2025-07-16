@@ -1,3 +1,12 @@
-variable "rule_name" {}
-variable "schedule_expression" {}
-variable "lambda_function_arn" {}
+
+variable "rule_name" {
+  type = string
+}
+
+variable "schedule_expression" {
+  type = string
+}
+
+variable "lambda_function_arn" {
+  type = string
+}
