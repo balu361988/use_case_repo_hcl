@@ -109,35 +109,36 @@ jobs:
 
     steps:
     
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Configure AWS Credentials (OIDC)
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        role-to-assume: arn:aws:iam::427521931204:role/karthick_OIDC
-        role-session-name: github-actions-session
-        aws-region: ap-southeast-2
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::427521931204:role/karthick_OIDC
+          role-session-name: github-actions-session
+          aws-region: ap-southeast-2
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build and Push Docker Image (Tagged with SHA)
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_NAME: hello-lambda
+      - name: Build and Push Docker Image (Tagged with SHA)
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: hello-lambda
         run: |
           docker build -t $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }} -f hello-lambda/Dockerfile hello-lambda/
           docker push $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
-    - name: Deploy Image to Lambda
-      env:
-         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-         IMAGE_NAME: hello-lambda
-      run: |
-        aws lambda update-function-code \
-          --function-name your-lambda-name \
-          --image-uri $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }} \
-          --region ap-southeast-2
+      - name: Deploy Image to Lambda
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: hello-lambda
+          run: |
+            aws lambda update-function-code \
+             --function-name your-lambda-name \
+             --image-uri $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }} \
+             --region ap-southeast-2
+
 
