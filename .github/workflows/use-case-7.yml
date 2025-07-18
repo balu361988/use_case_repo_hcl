@@ -61,9 +61,12 @@ jobs:
 
       - name: Create TFLint Config
         run: |
+          mkdir -p ~/.tflint.d/plugins
           cat <<EOF > .tflint.hcl
           plugin "aws" {
             enabled = true
+            version = "0.14.0"
+            source  = "github.com/terraform-linters/tflint-ruleset-aws"
             region  = "ap-southeast-2"
           }
           EOF
@@ -71,7 +74,6 @@ jobs:
       - name: Install TFLint and AWS Plugin
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-          mkdir -p ~/.tflint.d/plugins
           tflint --init
 
       - name: Run TFLint
