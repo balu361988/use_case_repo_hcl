@@ -98,8 +98,8 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-  docker-push:
-    name: Build and Push Docker Image to ECR
+  docker-and-lambda:
+    name: Build Docker & Deploy Lambda
     runs-on: ubuntu-latest
     needs: deploy
 
@@ -122,12 +122,20 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, Tag, and Push Docker image
+      - name: Build and Push Docker Image (Tagged with SHA)
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_NAME: use-case-7-lambda
         run: |
-          docker build -t $ECR_REGISTRY/$IMAGE_NAME:latest .
-          docker tag $ECR_REGISTRY/$IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }}
-          docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+          docker build -t $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }} -f hello-lambda/Dockerfile hello-lambda/
           docker push $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }}
+
+      - name: Deploy Image to Lambda
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: use-case-7-lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name your-lambda-name \
+            --image-uri $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }} \
+            --region ap-southeast-2
