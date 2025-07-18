@@ -16,6 +16,10 @@ jobs:
 
     environment: production
 
+    defaults:
+      run:
+        working-directory: use-case-7
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
