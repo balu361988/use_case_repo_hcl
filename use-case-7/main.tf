@@ -23,7 +23,7 @@ module "iam" {
 module "lambda" {
   source                = "./modules/lambda"
   function_name         = "hello-lambda-function"
-  image_uri             = "427521931204.dkr.ecr.ap-southeast-2.amazonaws.com/hello-lambda:latest"
+  image_uri             = "427521931204.dkr.ecr.ap-southeast-2.amazonaws.com/hello-lambda:v1"
   lambda_role_arn       = module.iam.iam_role_arn
   memory_size           = 128
   timeout               = 10
@@ -44,22 +44,6 @@ module "apigateway" {
   tags = {
     Environment = "dev"
     Project     = "use-case-7"
-  }
-}
-
-resource "aws_dynamodb_table" "terraform_lock" {
-  name         = "terraform-lock-table"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-
-  tags = {
-    Project     = "use-case-7"
-    Environment = "dev"
   }
 }
 
