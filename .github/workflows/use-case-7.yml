@@ -64,17 +64,23 @@ jobs:
           mkdir -p ~/.tflint.d/plugins
           cat <<EOF > .tflint.hcl
           plugin "aws" {
-            enabled = true
-            version = "0.14.0"
-            source  = "github.com/terraform-linters/tflint-ruleset-aws"
-            region  = "ap-southeast-2"
-          }
+          enabled = true
+          version = "0.14.0"
+          source  = "github.com/terraform-linters/tflint-ruleset-aws"
+          region  = "ap-southeast-2"
+           }
           EOF
 
       - name: Install TFLint and AWS Plugin
         run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          TFLINT_VERSION="v0.50.3"
+          curl -sSL -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/tflint_${TFLINT_VERSION}_linux_amd64.zip
+          unzip tflint.zip
+          sudo mv tflint /usr/local/bin/
+          rm tflint.zip
           tflint --init
+
+
 
       - name: Run TFLint
         run: tflint --recursive
