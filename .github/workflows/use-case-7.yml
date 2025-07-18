@@ -13,6 +13,7 @@ jobs:
   deploy:
     name: Terraform CI/CD with OIDC
     runs-on: ubuntu-latest
+
     environment: production
 
     defaults:
@@ -23,9 +24,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      #########################################
-      # terraform-docs setup and generation
-      #########################################
       - name: Install terraform-docs
         run: |
           curl -sSL -o terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
@@ -49,9 +47,6 @@ jobs:
           git commit -m "docs: update combined Terraform README" || echo "No changes to commit"
           git push
 
-      #########################################
-      # OIDC-based AWS Auth
-      #########################################
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -59,25 +54,19 @@ jobs:
           role-session-name: github-actions-session
           aws-region: ap-southeast-2
 
-      #########################################
-      # Terraform CLI Setup
-      #########################################
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.0
 
-      #########################################
-      # TFLint Setup and Execution
-      #########################################
       - name: Create TFLint Config
         run: |
           cat <<EOF > .tflint.hcl
-plugin "aws" {
-  enabled = true
-  region  = "ap-southeast-2"
-}
-EOF
+          plugin "aws" {
+            enabled = true
+            region  = "ap-southeast-2"
+          }
+          EOF
 
       - name: Install TFLint and AWS Plugin
         run: |
@@ -88,18 +77,12 @@ EOF
       - name: Run TFLint
         run: tflint --recursive
 
-      #########################################
-      # Terraform Init and Format
-      #########################################
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Format
         run: terraform fmt -recursive
 
-      #########################################
-      # Conftest Policy Checks (OPA)
-      #########################################
       - name: Install Conftest
         run: |
           wget https://github.com/open-policy-agent/conftest/releases/download/v0.45.0/conftest_0.45.0_Linux_x86_64.tar.gz
@@ -107,11 +90,8 @@ EOF
           sudo mv conftest /usr/local/bin
 
       - name: Run OPA Conftest
-        run: conftest test .
+        run: conftest test .  
 
-      #########################################
-      # Terraform Validate, Plan, Apply
-      #########################################
       - name: Terraform Validate
         run: terraform validate
 
