@@ -1,9 +1,12 @@
-name: Lambda Terraform OIDC Deployment
+name: Lambda Terraform OIDC Deployment and Docker Push to ECR
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'use-case-7/**'
+      - '.github/workflows/**'
 
 permissions:
   id-token: write
@@ -74,9 +77,6 @@ jobs:
       - name: Terraform Init
         run: terraform init -reconfigure
 
-      - name: Terraform Init
-        run: terraform init
-
       - name: Terraform Format
         run: terraform fmt -recursive
 
@@ -97,3 +97,37 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+
+  docker-push:
+    name: Build and Push Docker Image to ECR
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    defaults:
+      run:
+        working-directory: use-case-7
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::427521931204:role/karthick_OIDC
+          role-session-name: github-actions-session
+          aws-region: ap-southeast-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: use-case-7-lambda
+        run: |
+          docker build -t $ECR_REGISTRY/$IMAGE_NAME:latest .
+          docker tag $ECR_REGISTRY/$IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }}
+          docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+          docker push $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }}
