@@ -73,6 +73,12 @@ jobs:
           }
           EOF
 
+      - name: Install TFLint and AWS Plugin
+        run: |
+         curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+         mkdir -p ~/.tflint.d/plugins
+         tflint --init
+
       - name: Run TFLint
         run: |
           tflint --init
