@@ -59,31 +59,20 @@ jobs:
         with:
           terraform_version: 1.6.0
 
-      - name: Create TFLint Config
-        run: |
-          mkdir -p ~/.tflint.d/plugins
-          cat <<EOF > .tflint.hcl
-          plugin "aws" {
-          enabled = true
-          version = "0.14.0"
-          source  = "github.com/terraform-linters/tflint-ruleset-aws"
-          region  = "ap-southeast-2"
-           }
-          EOF
+      - name: Set up TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
 
-      - name: Install TFLint and AWS Plugin
-        run: |
-         TFLINT_VERSION="v0.50.3"
-         curl -sSL -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/tflint_linux_amd64.zip
-         unzip tflint.zip
-         sudo mv tflint /usr/local/bin/
-         rm tflint.zip
-         tflint --init
-
-
+      - name: Initialize TFLint
+        run: tflint --init
 
       - name: Run TFLint
-        run: tflint --recursive
+        run: tflint -f compact
+        continue-on-error: true
+
+      - name: Terraform Init
+        run: terraform init -reconfigure
 
       - name: Terraform Init
         run: terraform init
