@@ -108,7 +108,7 @@ jobs:
         working-directory: use-case-7
 
     steps:
-    
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -135,10 +135,8 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_NAME: hello-lambda
-          run: |
-            aws lambda update-function-code \
-             --function-name your-lambda-name \
-             --image-uri $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }} \
-             --region ap-southeast-2
-
-
+        run: |
+          aws lambda update-function-code \
+            --function-name hello-lambda-function \
+            --image-uri $ECR_REGISTRY/$IMAGE_NAME:${{ github.sha }} \
+            --region ap-southeast-2
