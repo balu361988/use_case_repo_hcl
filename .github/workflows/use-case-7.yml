@@ -59,6 +59,21 @@ jobs:
         with:
           terraform_version: 1.6.0
 
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+         tflint_version: latest
+
+      - name: Create TFLint Config
+        run: |
+          echo 'plugin "aws" { enabled = true region = "ap-southeast-2" }' > .tflint.hcl
+
+      - name: Run TFLint
+        run: |
+          tflint --init
+          tflint --recursive
+
+
       - name: Terraform Init
         run: terraform init
 
