@@ -73,12 +73,12 @@ jobs:
 
       - name: Install TFLint and AWS Plugin
         run: |
-          TFLINT_VERSION="v0.50.3"
-          curl -sSL -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/tflint_${TFLINT_VERSION}_linux_amd64.zip
-          unzip tflint.zip
-          sudo mv tflint /usr/local/bin/
-          rm tflint.zip
-          tflint --init
+         TFLINT_VERSION="v0.50.3"
+         curl -sSL -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/tflint_linux_amd64.zip
+         unzip tflint.zip
+         sudo mv tflint /usr/local/bin/
+         rm tflint.zip
+         tflint --init
 
 
 
