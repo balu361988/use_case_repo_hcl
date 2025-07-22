@@ -60,17 +60,6 @@ resource "aws_lb_target_group" "patient_service" {
   vpc_id   = var.vpc_id
   target_type = "ip"
 
-  health_check {
-    enabled             = true
-    healthy_threshold   = 2
-    interval            = 30
-    matcher             = "200"
-    path                = "/health"
-    port                = "traffic-port"
-    protocol            = "HTTP"
-    timeout             = 5
-    unhealthy_threshold = 2
-  }
 
   tags = {
     Name        = "${var.environment}-patient-tg"
@@ -86,17 +75,6 @@ resource "aws_lb_target_group" "appointment_service" {
   vpc_id   = var.vpc_id
   target_type = "ip"
 
-  health_check {
-    enabled             = true
-    healthy_threshold   = 2
-    interval            = 30
-    matcher             = "200"
-    path                = "/health"
-    port                = "traffic-port"
-    protocol            = "HTTP"
-    timeout             = 5
-    unhealthy_threshold = 2
-  }
 
   tags = {
     Name        = "${var.environment}-appointment-tg"
