@@ -1,5 +1,5 @@
-variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
+variable "vpc_id" {
+  description = "The VPC ID"
   type        = string
 }
 variable "environment" {
@@ -11,9 +11,9 @@ variable "pub_sub_count" {
   type        = number
 }
 
-variable "priv_sub_count" {
-  description = "Number of private subnets"
-  type        = number
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs"
+  type        = list(string)
 }
 
 variable "patient_repo_uri" {
