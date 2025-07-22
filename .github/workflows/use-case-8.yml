@@ -19,7 +19,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: usecase8
+        working-directory: use-case-8
 
     steps:
       - name: Checkout repository
