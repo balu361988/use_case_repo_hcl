@@ -292,13 +292,15 @@ resource "aws_ecs_service" "patient_service" {
     assign_public_ip = false
   }
 
-  load_balancer {
-    target_group_arn = var.patient_target_group_arn
-    container_name   = "patient-service"
-    container_port   = "3000"
-  }
+ load_balancer {
+  target_group_arn = aws_lb_target_group.patient_service.arn
+  container_name   = "patient-service"
+  container_port   = 3000
+}
 
-  depends_on = [var.patient_target_group_arn]
+depends_on = [
+  aws_lb_listener_rule.patient_service
+]
 
   tags = {
     Name        = "${var.environment}-patient-service"
@@ -322,12 +324,14 @@ resource "aws_ecs_service" "appointment_service" {
   }
 
   load_balancer {
-    target_group_arn = var.appointment_target_group_arn
-    container_name   = "appointment-service"
-    container_port   = "3001"
-  }
+  target_group_arn = aws_lb_target_group.appointment_service.arn
+  container_name   = "appointment-service"
+  container_port   = 3001
+}
 
-  depends_on = [var.appointment_target_group_arn]
+depends_on = [
+  aws_lb_listener_rule.appointment_service
+]
 
   tags = {
     Name        = "${var.environment}-appointment-service"
