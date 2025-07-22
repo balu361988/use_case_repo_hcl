@@ -4,15 +4,13 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
       }
-    ]
+    }]
   })
 
   tags = {
@@ -20,13 +18,11 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   }
 }
 
-# ECS Task Execution Role Policy Attachment
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# Additional policy for ECR access
 resource "aws_iam_role_policy" "ecs_task_execution_role_policy" {
   name = "${var.environment}-ecs-task-execution-policy"
   role = aws_iam_role.ecs_task_execution_role.id
@@ -56,21 +52,18 @@ resource "aws_iam_role_policy" "ecs_task_execution_role_policy" {
   })
 }
 
-# ECS Task Role
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.environment}-ecs-task-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
       }
-    ]
+    }]
   })
 
   tags = {
@@ -78,25 +71,22 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# ECS Task Role Policy for application-specific permissions
 resource "aws_iam_role_policy" "ecs_task_role_policy" {
   name = "${var.environment}-ecs-task-policy"
   role = aws_iam_role.ecs_task_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:DescribeLogStreams"
-        ]
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ]
+      Resource = "arn:aws:logs:*:*:*"
+    }]
   })
 }
 
@@ -128,7 +118,6 @@ resource "aws_security_group" "ecs_tasks" {
   }
 }
 
-# ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "${var.environment}-cluster"
 
@@ -143,7 +132,6 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
-# CloudWatch Log Group for Patient Service
 resource "aws_cloudwatch_log_group" "patient_service" {
   name              = "/ecs/${var.environment}/patient-service"
   retention_in_days = 7
@@ -155,7 +143,6 @@ resource "aws_cloudwatch_log_group" "patient_service" {
   }
 }
 
-# CloudWatch Log Group for Appointment Service
 resource "aws_cloudwatch_log_group" "appointment_service" {
   name              = "/ecs/${var.environment}/appointment-service"
   retention_in_days = 7
@@ -167,7 +154,8 @@ resource "aws_cloudwatch_log_group" "appointment_service" {
   }
 }
 
-# ECS Task Definition for Patient Service
+data "aws_region" "current" {}
+
 resource "aws_ecs_task_definition" "patient_service" {
   family                   = "${var.environment}-patient-service"
   network_mode             = "awsvpc"
@@ -177,42 +165,31 @@ resource "aws_ecs_task_definition" "patient_service" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
-  container_definitions = jsonencode([
-    {
-      name  = "patient-service"
-      image = "${var.patient_repo_uri}:latest"
-      
-      portMappings = [
-        {
-          containerPort = 3000
-          protocol      = "tcp"
-        }
-      ]
-  
+  container_definitions = jsonencode([{
+    name  = "patient-service"
+    image = "${var.patient_repo_uri}:latest"
 
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.patient_service.name
-          "awslogs-region"        = data.aws_region.current.name
-          "awslogs-stream-prefix" = "ecs"
-        }
+    portMappings = [{
+      containerPort = 3000
+      protocol      = "tcp"
+    }]
+
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.patient_service.name
+        "awslogs-region"        = data.aws_region.current.name
+        "awslogs-stream-prefix" = "ecs"
       }
-
-      environment = [
-        {
-          name  = "NODE_ENV"
-          value = var.environment
-        },
-        {
-          name  = "PORT"
-          value = tostring("3000")
-        }
-      ]
-
-      essential = true
     }
-  ])
+
+    environment = [
+      { name = "NODE_ENV", value = var.environment },
+      { name = "PORT", value = "3000" }
+    ]
+
+    essential = true
+  }])
 
   tags = {
     Name        = "${var.environment}-patient-service-task"
@@ -221,12 +198,6 @@ resource "aws_ecs_task_definition" "patient_service" {
   }
 }
 
-
-# Data source for current AWS region
-data "aws_region" "current" {
-}
-
-# ECS Task Definition for Appointment Service
 resource "aws_ecs_task_definition" "appointment_service" {
   family                   = "${var.environment}-appointment-service"
   network_mode             = "awsvpc"
@@ -236,41 +207,31 @@ resource "aws_ecs_task_definition" "appointment_service" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
-  container_definitions = jsonencode([
-    {
-      name  = "appointment-service"
-      image = "${var.appointment_repo_uri}:latest"
-      
-      portMappings = [
-        {
-          containerPort = 3001
-          protocol      = "tcp"
-        }
-      ]
+  container_definitions = jsonencode([{
+    name  = "appointment-service"
+    image = "${var.appointment_repo_uri}:latest"
 
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.appointment_service.name
-          "awslogs-region"        = data.aws_region.current.name
-          "awslogs-stream-prefix" = "ecs"
-        }
+    portMappings = [{
+      containerPort = 3001
+      protocol      = "tcp"
+    }]
+
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.appointment_service.name
+        "awslogs-region"        = data.aws_region.current.name
+        "awslogs-stream-prefix" = "ecs"
       }
-
-      environment = [
-        {
-          name  = "NODE_ENV"
-          value = var.environment
-        },
-        {
-          name  = "PORT"
-          value = tostring("3001")
-        }
-      ]
-
-      essential = true
     }
-  ])
+
+    environment = [
+      { name = "NODE_ENV", value = var.environment },
+      { name = "PORT", value = "3001" }
+    ]
+
+    essential = true
+  }])
 
   tags = {
     Name        = "${var.environment}-appointment-service-task"
@@ -278,43 +239,11 @@ resource "aws_ecs_task_definition" "appointment_service" {
   }
 }
 
-# ECS Service for Patient Service
 resource "aws_ecs_service" "patient_service" {
   name            = "${var.environment}-patient-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.patient_service.arn
-  desired_count   = "1"
-  launch_type     = "FARGATE"
-
-  network_configuration {
-    security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = var.private_subnet_ids
-    assign_public_ip = false
-  }
-
- load_balancer {
-  target_group_arn = aws_lb_target_group.patient_service.arn
-  container_name   = "patient-service"
-  container_port   = 3000
-}
-
-depends_on = [
-  aws_lb_listener_rule.patient_service
-]
-
-  tags = {
-    Name        = "${var.environment}-patient-service"
-    Service     = "patient-service"
-    Environment = var.environment
-  }
-}
-
-# ECS Service for Appointment Service
-resource "aws_ecs_service" "appointment_service" {
-  name            = "${var.environment}-appointment-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.appointment_service.arn
-  desired_count   = "1"
+  desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -324,14 +253,44 @@ resource "aws_ecs_service" "appointment_service" {
   }
 
   load_balancer {
-  target_group_arn = aws_lb_target_group.appointment_service.arn
-  container_name   = "appointment-service"
-  container_port   = 3001
+    target_group_arn = aws_lb_target_group.patient_service.arn
+    container_name   = "patient-service"
+    container_port   = 3000
+  }
+
+  depends_on = [
+    aws_lb_listener_rule.patient_service
+  ]
+
+  tags = {
+    Name        = "${var.environment}-patient-service"
+    Service     = "patient-service"
+    Environment = var.environment
+  }
 }
 
-depends_on = [
-  aws_lb_listener_rule.appointment_service
-]
+resource "aws_ecs_service" "appointment_service" {
+  name            = "${var.environment}-appointment-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.appointment_service.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    subnets          = var.private_subnet_ids
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.appointment_service.arn
+    container_name   = "appointment-service"
+    container_port   = 3001
+  }
+
+  depends_on = [
+    aws_lb_listener_rule.appointment_service
+  ]
 
   tags = {
     Name        = "${var.environment}-appointment-service"
