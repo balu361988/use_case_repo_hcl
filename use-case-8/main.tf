@@ -14,10 +14,15 @@ module "alb" {
 }
 module "ecs" {
   source = "./modules/ecs"
-  private_subnet_ids = module.vpc.private_subnet_ids
-  environment = var.environment
-  vpc_id = module.vpc.vpc_id
-  patient_repo_uri = var.patient_repo_uri
-  appointment_repo_uri = var.appointment_repo_uri
-  alb_sg_id = module.alb.alb_sg_id
+
+  environment                        = var.environment
+  vpc_id                             = var.vpc_id
+  alb_sg_id                          = module.alb.alb_sg_id
+  private_subnet_ids                 = var.private_subnet_ids
+  patient_repo_uri                   = var.patient_repo_uri
+  appointment_repo_uri              = var.appointment_repo_uri
+  patient_target_group_arn          = module.alb.patient_target_group_arn
+  appointment_target_group_arn      = module.alb.appointment_target_group_arn
+  patient_listener_rule_depends_on  = module.alb.patient_listener_rule_depends_on
+  appointment_listener_rule_depends_on = module.alb.appointment_listener_rule_depends_on
 }
