@@ -29,7 +29,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::427521931204:role/karthick_OIDC
+          role-to-assume: arn:aws:iam::911723817934:role/oidc_role
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
