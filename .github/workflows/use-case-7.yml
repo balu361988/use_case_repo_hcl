@@ -1,5 +1,4 @@
 name: Lambda Terraform OIDC Deployment and Docker Push to ECR
-
 on:
   push:
     branches:
