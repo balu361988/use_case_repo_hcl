@@ -6,10 +6,9 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ap-south-1
-  PATIENT_REPO: 911723817934.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest
-  APPOINTMENT_REPO: 
-911723817934.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest
+  AWS_REGION: us-east-1
+  PATIENT_REPO: 911723817934.dkr.ecr.us-east-1.amazonaws.com/patient-service
+  APPOINTMENT_REPO: 911723817934.dkr.ecr.us-east-1.amazonaws.com/appointment-service
 permissions:
   id-token: write
   contents: write
