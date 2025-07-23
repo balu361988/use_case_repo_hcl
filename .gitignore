@@ -1,0 +1,36 @@
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.backup
+.terraform.lock.hcl
+
+# Python + Flask
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+*.log
+
+# Docker
+*.tar
+docker-compose.override.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# AWS credentials or secrets
+*.pem
+*.key
+*.crt
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Zip files
+*.zip
+
