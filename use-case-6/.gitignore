@@ -1,0 +1,13 @@
+# Terraform files to ignore
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# GitHub Actions folder (if you want to keep it local only)
+.github/
+
+# OS and editor files
+*.DS_Store
+*.swp
+

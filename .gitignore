@@ -1,10 +1,10 @@
-# Terraform files
+# Terraform
 .terraform/
 *.tfstate
 *.tfstate.*
-crash.log
-*.backup
 .terraform.lock.hcl
+*.backup
+crash.log
 
 # Python + Flask
 __pycache__/
@@ -22,12 +22,13 @@ docker-compose.override.yml
 .DS_Store
 Thumbs.db
 
-# AWS credentials or secrets
+# AWS
 *.pem
 *.key
 *.crt
+*.swp
 
-# IDEs and editors
+# IDEs
 .vscode/
 .idea/
 

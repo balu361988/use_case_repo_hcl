@@ -1,0 +1,110 @@
+name: Terraform - Use Case 6
+
+on:
+  push:
+    paths:
+      - 'use-case-6/**'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: use-case-6
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install terraform-docs
+        run: |
+          curl -sSL -o terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+
+      - name: Generate Combined Terraform Docs for All Modules
+        run: |
+          echo "# Terraform Modules Documentation" > README.md
+          for dir in modules/*/; do
+            echo -e "\n## Module: ${dir#*/}" >> README.md
+            terraform-docs markdown "$dir" >> README.md
+          done
+
+      - name: Commit Combined README
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add README.md
+          git commit -m "docs: update combined Terraform README" || echo "No changes to commit"
+          git push
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::772693223647:role/OIDC
+          aws-region: ap-south-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -recursive
+
+      - name: Install Conftest
+        run: |
+          wget https://github.com/open-policy-agent/conftest/releases/download/v0.45.0/conftest_0.45.0_Linux_x86_64.tar.gz
+          tar -xzf conftest_0.45.0_Linux_x86_64.tar.gz
+          sudo mv conftest /usr/local/bin
+
+      - name: Run OPA Conftest
+        run: conftest test .
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: github.event_name == 'workflow_dispatch'
+        run: terraform apply -auto-approve
+        
+
+     # - name: Install Checkov
+     #    run: pip install checkov
+
+     # - name: Run Checkov
+     #  run: checkov -d use-case-6
+
+     #  - name: Setup TFLint
+     #    uses: terraform-linters/setup-tflint@v4
+     #    with:
+     #      tflint_version: latest
+
+     #  - name: Create TFLint Config
+     #    run: echo 'plugin "aws" { enabled = true region = "ap-south-1" }' > .tflint.hcl
+     #    working-directory: use-case-6
+
+
+     #  - name: Run TFLint
+     #    run: |
+     #      echo 'plugin "aws" { enabled = true region = "ap-south-1" }' > use-case-6/.tflint.hcl
+     #      tflint --init
+     #      tflint --recursive
+     #    working-directory: use-case-6
+        
+       
+
+
+          
+
