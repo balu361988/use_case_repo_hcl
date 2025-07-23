@@ -1,5 +1,37 @@
+# Terraform
 .terraform/
-terraform.tfstate
-terraform.tfstate.*
+*.tfstate
+*.tfstate.*
 .terraform.lock.hcl
+*.backup
+crash.log
+
+# Python + Flask
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+*.log
+
+# Docker
+*.tar
+docker-compose.override.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# AWS
+*.pem
+*.key
+*.crt
 *.swp
+
+# IDEs
+.vscode/
+.idea/
+
+# Zip files
+*.zip
+
