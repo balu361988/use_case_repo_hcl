@@ -27,6 +27,7 @@ jobs:
     - name: Build, tag, and push image to ECR
       run: |
          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+         pwd
          docker build -t $IMAGE_URI ./use-case-9/use_case_repo_hcl/use-case-9/application/
          docker push $IMAGE_URI
 
