@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,21 +24,23 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push image to ECR
+    - name: Build, tag, and push Docker image to ECR
       run: |
-         IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
-         pwd
-         docker build -t $IMAGE_URI /home/runner/work/use_case_repo_hcl/use_case_repo_hcl/use-case-9/application/
-         docker push $IMAGE_URI
+        IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+        docker build -t $IMAGE_URI ./use-case-9/application/
+        docker push $IMAGE_URI
 
-
-    # Optional: Deploy to EKS
-    - name: Update kubeconfig
+    - name: Update kubeconfig for EKS
       run: |
         aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-    - name: Apply Kubernetes manifests
-      run: | 
-        pwd
-        kubectl apply -f /home/runner/work/use_case_repo_hcl/use_case_repo_hcl/use-case-9/application/deployment.yaml
-        kubectl apply -f /home/runner/work/use_case_repo_hcl/use_case_repo_hcl/use-case-9/application/service.yaml
+    - name: Deploy Kubernetes manifests
+      run: |
+        kubectl apply -f ./use-case-9/application/deployment.yaml
+        kubectl apply -f ./use-case-9/application/service.yaml
+
+    - name: Terraform Destroy (Optional: Only enable if needed)
+      run: |
+        cd ./use-case-9
+        terraform init
+        terraform destroy -auto-approve
