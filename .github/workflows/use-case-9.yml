@@ -39,7 +39,7 @@ jobs:
         kubectl apply -f ./use-case-9/application/deployment.yaml
         kubectl apply -f ./use-case-9/application/service.yaml
 
-    - name: Terraform Destroy (Optional: Only enable if needed)
+    - name: Terraform Destroy (optional)
       run: |
         cd ./use-case-9
         terraform init
