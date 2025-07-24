@@ -38,6 +38,7 @@ jobs:
         aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
     - name: Apply Kubernetes manifests
-      run: |
+      run: | 
+        pwd
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
