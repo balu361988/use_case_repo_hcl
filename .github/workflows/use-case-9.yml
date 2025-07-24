@@ -24,13 +24,13 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build and push Docker image
+      env:
+        ECR_REGISTRY: 045911161916.dkr.ecr.ap-south-1.amazonaws.com
+        ECR_REPOSITORY: flask-app
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        IMAGE_TAG=${{ github.sha }}
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      env:
-        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
 
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
@@ -42,5 +42,9 @@ jobs:
         echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
 
     - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: 045911161916.dkr.ecr.ap-south-1.amazonaws.com
+        ECR_REPOSITORY: flask-app
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        kubectl set image deployment/flask-deployment flask-app=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+        kubectl set image deployment/flask-deployment flask-app=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
