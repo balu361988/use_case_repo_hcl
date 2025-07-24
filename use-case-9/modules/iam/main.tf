@@ -1,3 +1,4 @@
+
 resource "aws_iam_role" "eks_cluster_role" {
   name = "${var.env}-eks-cluster-role"
 
@@ -50,4 +51,3 @@ resource "aws_iam_role_policy_attachment" "worker_node_policies" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = var.worker_node_policy_arns[count.index]
 }
-
