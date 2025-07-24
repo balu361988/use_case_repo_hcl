@@ -9,4 +9,3 @@ worker_node_policy_arns = [
   "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
   "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 ]
-
