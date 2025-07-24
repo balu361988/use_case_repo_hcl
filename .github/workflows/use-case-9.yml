@@ -40,5 +40,5 @@ jobs:
     - name: Apply Kubernetes manifests
       run: | 
         pwd
-        kubectl apply -f deployment.yaml
-        kubectl apply -f service.yaml
+        kubectl apply -f /home/runner/work/use_case_repo_hcl/use_case_repo_hcl/deployment.yaml
+        kubectl apply -f /home/runner/work/use_case_repo_hcl/use_case_repo_hcl/service.yaml
