@@ -1,11 +1,12 @@
-name: Deploy Flask App to EKS
+name: Build and Deploy to ECR
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,29 +24,18 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and push Docker image
-      env:
-        ECR_REGISTRY: 045911161916.dkr.ecr.ap-south-1.amazonaws.com
-        ECR_REPOSITORY: flask-app
-        IMAGE_TAG: ${{ github.sha }}
+    - name: Build, tag, and push image to ECR
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./use-case-9/application
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+        docker build -t $IMAGE_URI .
+        docker push $IMAGE_URI
 
-    - name: Setup kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: v1.29.0
-
-    - name: Configure kubeconfig
+    # Optional: Deploy to EKS
+    - name: Update kubeconfig
       run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+        aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-    - name: Deploy to EKS
-      env:
-        ECR_REGISTRY: 045911161916.dkr.ecr.ap-south-1.amazonaws.com
-        ECR_REPOSITORY: flask-app
-        IMAGE_TAG: ${{ github.sha }}
+    - name: Apply Kubernetes manifests
       run: |
-        kubectl set image deployment/flask-deployment flask-app=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
