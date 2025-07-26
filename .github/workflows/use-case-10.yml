@@ -1,11 +1,10 @@
 name: Docker Build and Push to ECR
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'use-case-10/**'
+  paths:
+  - 'patient-service/**'
+  - 'appointment-service/**'
+  - '.github/workflows/use-case-10.yml'
 
 permissions:
   id-token: write
