@@ -1,4 +1,4 @@
-name: Use Case 10 – Full CI/CD (Docker + Terraform)
+name: Use Case 10 - Full CI/CD (Docker + Terraform)
 
 on:
   push:
