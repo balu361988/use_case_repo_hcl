@@ -1,40 +1,52 @@
-name: Docker build and push to ECR
+name: Docker Build and Push to ECR
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
+
+env:
+  AWS_REGION: us-east-1
+  ACCOUNT_ID: 045911161916
+  PATIENT_REPO: patient-service
+  APPOINTMENT_REPO: appointment-service
 
 jobs:
-  build-and-push:
+  push-to-ecr:
+    name: Build & Push Docker Images
     runs-on: ubuntu-latest
 
-    environment: production
-
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::045911161916:role/OIDC
-          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/OIDC
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push Patient Service
+      - name: Build Patient Service Docker Image
         run: |
-          docker build -t patient-service:latest ./patient-service
-          docker tag patient-service:latest 045911161916.dkr.ecr.us-east-1.amazonaws.com/patient-service:v1
-          docker push 045911161916.dkr.ecr.us-east-1.amazonaws.com/patient-service:v1
+          docker build -t patient-service ./patient-service
+          docker tag patient-service:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:v1
 
-      - name: Build and push Appointment Service
+      - name: Push Patient Service Docker Image
         run: |
-          docker build -t appointment-service:latest ./appointment-service
-          docker tag appointment-service:latest 045911161916.dkr.ecr.us-east-1.amazonaws.com/appointment-service:v1
-          docker push 045911161916.dkr.ecr.us-east-1.amazonaws.com/appointment-service:v1
+          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:v1
+
+      - name: Build Appointment Service Docker Image
+        run: |
+          docker build -t appointment-service ./appointment-service
+          docker tag appointment-service:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$APPOINTMENT_REPO:v1
+
+      - name: Push Appointment Service Docker Image
+        run: |
+          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$APPOINTMENT_REPO:v1
