@@ -1,30 +1,49 @@
-# .github/workflows/terraform_ecr.yml
-name: Terraform ECR
+name: Docker Build and Push to ECR
 
 on:
-  workflow_dispatch:  # run manually once to create ECR repos
+  push:
+    branches:
+      - main
+    paths:
+      - 'patient/**'
+      - 'appointment/**'
+      - '.github/workflows/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPO_PATIENT: patient-service
+  ECR_REPO_APPOINTMENT: appointment-service
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::045911161916:role/OIDC
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.6.6
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ecr
+      - name: Build and Push Patient Image
+        run: |
+          docker build -t $ECR_REPO_PATIENT ./patient
+          docker tag $ECR_REPO_PATIENT:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_PATIENT:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_PATIENT:latest
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: ecr
+      - name: Build and Push Appointment Image
+        run: |
+          docker build -t $ECR_REPO_APPOINTMENT ./appointment
+          docker tag $ECR_REPO_APPOINTMENT:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_APPOINTMENT:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_APPOINTMENT:latest
