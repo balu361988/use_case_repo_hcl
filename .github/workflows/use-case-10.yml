@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - 'appointment-service/**'
-      - 'patient-service/**'
+      - 'use-case-10/**'
       - '.github/workflows/use-case-10.yml'
+
 
 
 permissions:
