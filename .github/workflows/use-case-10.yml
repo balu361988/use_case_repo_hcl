@@ -18,10 +18,6 @@ jobs:
     name: Docker Build & Terraform Deploy
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./use-case-10
-
     steps:
     - name: Checkout source code
       uses: actions/checkout@v3
@@ -39,13 +35,13 @@ jobs:
 
     - name: Build and push frontend image
       run: |
-        docker build -t $ECR_REPO_FRONTEND:latest ./apps/frontend
+        docker build -t $ECR_REPO_FRONTEND:latest ./use-case-10/apps/frontend
         docker tag $ECR_REPO_FRONTEND:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_FRONTEND:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_FRONTEND:latest
 
     - name: Build and push backend image
       run: |
-        docker build -t $ECR_REPO_BACKEND:latest ./apps/backend
+        docker build -t $ECR_REPO_BACKEND:latest ./use-case-10/apps/backend
         docker tag $ECR_REPO_BACKEND:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_BACKEND:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_BACKEND:latest
 
@@ -55,16 +51,21 @@ jobs:
         terraform_version: 1.6.6
 
     - name: Terraform Init
-      run: terraform init
+      working-directory: ./use-case-10
+      run: terraform init -reconfigure
 
     - name: Terraform Format
+      working-directory: ./use-case-10
       run: terraform fmt -recursive
 
     - name: Terraform Validate
+      working-directory: ./use-case-10
       run: terraform validate
 
     - name: Terraform Plan
+      working-directory: ./use-case-10
       run: terraform plan -out=tfplan
 
     - name: Terraform Apply
+      working-directory: ./use-case-10
       run: terraform apply -auto-approve tfplan
