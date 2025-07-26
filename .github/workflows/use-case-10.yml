@@ -36,11 +36,11 @@ jobs:
       - name: Build & Push Patient Service Docker Image
         run: |
           IMAGE_URI=${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.PATIENT_REPO }}:v1
-          docker build -t $IMAGE_URI ./patient-service
+          docker build -t $IMAGE_URI use-case-10/apps/patient
           docker push $IMAGE_URI
 
       - name: Build & Push Appointment Service Docker Image
         run: |
           IMAGE_URI=${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APPOINTMENT_REPO }}:v1
-          docker build -t $IMAGE_URI ./appointment-service
+          docker build -t $IMAGE_URI use-case-10/apps/appointment
           docker push $IMAGE_URI
