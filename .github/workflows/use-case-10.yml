@@ -1,42 +1,40 @@
-name: Build and Push Docker Images to ECR
+name: Docker build and push to ECR
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
-env:
-  AWS_REGION: us-east-1
-  ACCOUNT_ID: 045911161916
-  PATIENT_REPO: patient-service
-  APPOINTMENT_REPO: appointment-service
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    environment: production
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::045911161916:role/OIDC
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
       - name: Login to Amazon ECR
-        run: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and Push patient-service
-        working-directory: ./patient-service
+      - name: Build and push Patient Service
         run: |
-          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:latest .
-          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:latest
+          docker build -t patient-service:latest ./patient-service
+          docker tag patient-service:latest 045911161916.dkr.ecr.us-east-1.amazonaws.com/patient-service:v1
+          docker push 045911161916.dkr.ecr.us-east-1.amazonaws.com/patient-service:v1
 
-      - name: Build and Push appointment-service
-        working-directory: ./appointment-service
+      - name: Build and push Appointment Service
         run: |
-          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$APPOINTMENT_REPO:latest .
-          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$APPOINTMENT_REPO:latest
+          docker build -t appointment-service:latest ./appointment-service
+          docker tag appointment-service:latest 045911161916.dkr.ecr.us-east-1.amazonaws.com/appointment-service:v1
+          docker push 045911161916.dkr.ecr.us-east-1.amazonaws.com/appointment-service:v1
