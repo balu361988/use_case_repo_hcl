@@ -1,11 +1,11 @@
-name: Docker Build and Push to ECR
+name: Use Case 10 – Full CI/CD (Docker + Terraform)
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'use-case-10/apps/**'
+      - 'use-case-10/**'
       - '.github/workflows/use-case-10.yml'
 
 env:
@@ -14,8 +14,8 @@ env:
   ECR_REPO_BACKEND: dev-backend
 
 jobs:
-  docker-build-and-push:
-    name: Build & Push Docker Images
+  build-and-deploy:
+    name: Docker Build & Terraform Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -44,3 +44,28 @@ jobs:
         docker build -t $ECR_REPO_BACKEND:latest ./use-case-10/apps/backend
         docker tag $ECR_REPO_BACKEND:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_BACKEND:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_BACKEND:latest
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.6.6
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./use-case-10/infra
+
+    - name: Terraform Format
+      run: terraform fmt -check
+      working-directory: ./use-case-10/infra
+
+    - name: Terraform Validate
+      run: terraform validate
+      working-directory: ./use-case-10/infra
+
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
+      working-directory: ./use-case-10/infra
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
+      working-directory: ./use-case-10/infra
