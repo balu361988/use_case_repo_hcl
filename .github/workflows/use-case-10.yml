@@ -18,6 +18,10 @@ jobs:
     name: Docker Build & Terraform Deploy
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./use-case-10
+
     steps:
     - name: Checkout source code
       uses: actions/checkout@v3
@@ -52,20 +56,20 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
-      working-directory: ./use-case-10/infra
+      working-directory: ./use-case-10
 
     - name: Terraform Format
       run: terraform fmt -check
-      working-directory: ./use-case-10/infra
+      working-directory: ./use-case-10
 
     - name: Terraform Validate
       run: terraform validate
-      working-directory: ./use-case-10/infra
+      working-directory: ./use-case-10
 
     - name: Terraform Plan
       run: terraform plan -out=tfplan
-      working-directory: ./use-case-10/infra
+      working-directory: ./use-case-10
 
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
-      working-directory: ./use-case-10/infra
+      working-directory: ./use-case-10
