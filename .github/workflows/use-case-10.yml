@@ -5,10 +5,9 @@ on:
     branches:
       - main
     paths:
-      - 'use-case-10/**'
+      - 'patient-service/**'
+      - 'appointment-service/**'
       - '.github/workflows/use-case-10.yml'
-
-
 
 permissions:
   id-token: write
@@ -40,20 +39,12 @@ jobs:
 
       - name: Build Patient Service Docker Image
         run: |
-          IMAGE_URI=045911161916.dkr.ecr.us-east-1.amazonaws.com/patient-service:v1
+          IMAGE_URI=${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.PATIENT_REPO }}:v1
           docker build -t $IMAGE_URI ./patient-service
           docker push $IMAGE_URI
 
-      - name: Push Patient Service Docker Image
-        run: |
-          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:v1
-
       - name: Build Appointment Service Docker Image
         run: |
-          IMAGE_URI=045911161916.dkr.ecr.us-east-1.amazonaws.com/appointment-service:v1
+          IMAGE_URI=${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APPOINTMENT_REPO }}:v1
           docker build -t $IMAGE_URI ./appointment-service
           docker push $IMAGE_URI
-
-      - name: Push Appointment Service Docker Image
-        run: |
-          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$APPOINTMENT_REPO:v1
