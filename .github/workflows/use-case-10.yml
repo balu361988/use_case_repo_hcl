@@ -1,4 +1,4 @@
-name: ECR Terraform & Docker Push
+name: Terraform ECR + Docker Push
 
 on:
   push:
@@ -8,22 +8,23 @@ on:
       - 'ecr/**'
       - '.github/workflows/**'
 
+env:
+  AWS_REGION: us-east-1
+  ECR_REPO_NAME: patient-service
+  ACCOUNT_ID: 045911161916
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    env:
-      AWS_REGION: ap-south-1
-      ECR_REPO_NAME: patient-service
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/OIDC
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/OIDC
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
@@ -33,18 +34,19 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./ecr
+        working-directory: ecr
 
-      - name: Terraform Apply
+      - name: Terraform Apply (create ECR repos)
         run: terraform apply -auto-approve
-        working-directory: ./ecr
+        working-directory: ecr
 
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin <account_id>.dkr.ecr.$AWS_REGION.amazonaws.com
+          aws ecr get-login-password --region $AWS_REGION | \
+          docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      - name: Build and Push Docker Image
+      - name: Build & Push Docker Image
         run: |
-          IMAGE_URI=<account_id>.dkr.ecr.$AWS_REGION.amazonaws.com/${{ env.ECR_REPO_NAME }}:latest
+          IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
