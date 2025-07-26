@@ -5,13 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'patient-service/**'
-      - 'appointment-service/**'
+      - 'use-case-10/**'
       - '.github/workflows/use-case-10.yml'
-
-permissions:
-  id-token: write
-  contents: write
 
 env:
   AWS_REGION: us-east-1
@@ -28,21 +23,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials (no OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/OIDC
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Patient Service Docker Image
+      - name: Build & Push Patient Service Docker Image
         run: |
           IMAGE_URI=${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.PATIENT_REPO }}:v1
           docker build -t $IMAGE_URI ./patient-service
           docker push $IMAGE_URI
-      - name: Build Appointment Service Docker Image
+
+      - name: Build & Push Appointment Service Docker Image
         run: |
           IMAGE_URI=${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APPOINTMENT_REPO }}:v1
           docker build -t $IMAGE_URI ./appointment-service
