@@ -35,8 +35,9 @@ jobs:
 
       - name: Build Patient Service Docker Image
         run: |
-          docker build -t patient-service ./patient-service
-          docker tag patient-service:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:v1
+          IMAGE_URI=045911161916.dkr.ecr.us-east-1.amazonaws.com/patient-service:v1
+          docker build -t $IMAGE_URI ./patient-service
+          docker push $IMAGE_URI
 
       - name: Push Patient Service Docker Image
         run: |
@@ -44,8 +45,9 @@ jobs:
 
       - name: Build Appointment Service Docker Image
         run: |
-          docker build -t appointment-service ./appointment-service
-          docker tag appointment-service:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$APPOINTMENT_REPO:v1
+          IMAGE_URI=045911161916.dkr.ecr.us-east-1.amazonaws.com/appointment-service:v1
+          docker build -t $IMAGE_URI ./appointment-service
+          docker push $IMAGE_URI
 
       - name: Push Appointment Service Docker Image
         run: |
