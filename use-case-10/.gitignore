@@ -1,0 +1,26 @@
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+.crash
+*.tfvars.backup
+*.tfplan
+
+# Node
+node_modules/
+npm-debug.log
+
+# GitHub Actions cache
+.github/*.log
+.github/.DS_Store
+
+# OS
+.DS_Store
+
+# Editor folders
+.vscode/
+.idea/
+
+# Ignore this .gitignore itself from being added if needed
+!.gitignore
+
