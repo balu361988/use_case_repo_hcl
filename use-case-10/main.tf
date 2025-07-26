@@ -18,6 +18,8 @@ module "vpc" {
 
 module "ecr" {
   source = "./modules/ecr"
+  patient_repo     = var.patient_repo
+  appointment_repo = var.appointment_repo
 }
 
 module "iam" {
