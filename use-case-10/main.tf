@@ -8,11 +8,11 @@ module "vpc" {
 }
 
 module "alb" {
-  source               = "./modules/alb"
-  vpc_id               = module.vpc.vpc_id
-  public_subnet_ids    = module.vpc.public_subnet_ids
+  source                = "./modules/alb"
+  vpc_id                = module.vpc.vpc_id
+  public_subnet_ids     = module.vpc.public_subnet_ids
   alb_security_group_id = aws_security_group.alb_sg.id
-  environment          = var.environment
+  environment           = var.environment
 }
 
 resource "aws_security_group" "alb_sg" {
@@ -51,16 +51,16 @@ module "ecr" {
 
 
 module "ecs" {
-  source                 = "./modules/ecs"
-  vpc_id                 = module.vpc.vpc_id
-  alb_sg_id              = aws_security_group.alb_sg.id
-  public_subnet_ids      = module.vpc.public_subnet_ids
+  source                  = "./modules/ecs"
+  vpc_id                  = module.vpc.vpc_id
+  alb_sg_id               = aws_security_group.alb_sg.id
+  public_subnet_ids       = module.vpc.public_subnet_ids
   task_execution_role_arn = module.iam.ecs_task_execution_role_arn
-  ecr_repo_frontend      = module.ecr.frontend_repo_url
-  ecr_repo_backend       = module.ecr.backend_repo_url
-  tg_frontend_arn        = module.alb.tg_frontend_arn
-  tg_backend_arn         = module.alb.tg_backend_arn
-  alb_listener_arn       = module.alb.alb_listener_arn
-  environment            = var.environment
+  ecr_repo_frontend       = module.ecr.frontend_repo_url
+  ecr_repo_backend        = module.ecr.backend_repo_url
+  tg_frontend_arn         = module.alb.tg_frontend_arn
+  tg_backend_arn          = module.alb.tg_backend_arn
+  alb_listener_arn        = module.alb.alb_listener_arn
+  environment             = var.environment
 }
 
