@@ -1,69 +1,50 @@
-name: UC-10 Infra & App Deployment
+name: ECR Terraform & Docker Push
 
 on:
   push:
     branches:
       - main
     paths:
-      - "use-case-10/**"
-      - ".github/workflows/use-case-10.yml"
-
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  AWS_REGION: us-east-1
-  PATIENT_ECR: patient-service
-  APPOINTMENT_ECR: appointment-service
+      - 'ecr/**'
+      - '.github/workflows/**'
 
 jobs:
   deploy:
-    name: Build, Push & Deploy
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: use-case-10
+    env:
+      AWS_REGION: ap-south-1
+      ECR_REPO_NAME: patient-service
 
     steps:
-      - name: 🧾 Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔐 Configure AWS Credentials (OIDC)
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::045911161916:role/OIDC
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/OIDC
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: 🔑 Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: 🐳 Build and Push Patient Image
-        run: |
-          docker build -t $PATIENT_ECR ./apps/patient
-          docker tag $PATIENT_ECR:latest 045911161916.dkr.ecr.${AWS_REGION}.amazonaws.com/$PATIENT_ECR:latest
-          docker push 045911161916.dkr.ecr.${AWS_REGION}.amazonaws.com/$PATIENT_ECR:latest
-
-      - name: 🐳 Build and Push Appointment Image
-        run: |
-          docker build -t $APPOINTMENT_ECR ./apps/appointment
-          docker tag $APPOINTMENT_ECR:latest 045911161916.dkr.ecr.${AWS_REGION}.amazonaws.com/$APPOINTMENT_ECR:latest
-          docker push 045911161916.dkr.ecr.${AWS_REGION}.amazonaws.com/$APPOINTMENT_ECR:latest
-
-      - name: ⚙️ Setup Terraform
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.6
 
-      - name: 📦 Terraform Init
+      - name: Terraform Init
         run: terraform init
+        working-directory: ./ecr
 
-      - name: 🔍 Terraform Validate
-        run: terraform validate
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: ./ecr
 
-      - name: 📐 Terraform Plan
-        run: terraform plan -out=tfplan
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin <account_id>.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      - name: 🚀 Terraform Apply
-        run: terraform apply -auto-approve tfplan
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_URI=<account_id>.dkr.ecr.$AWS_REGION.amazonaws.com/${{ env.ECR_REPO_NAME }}:latest
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
