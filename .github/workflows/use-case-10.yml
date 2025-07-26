@@ -4,22 +4,20 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'patient-service/**'
-      - 'appointment-service/**'
-      - '.github/workflows/**'
 
 env:
   AWS_REGION: us-east-1
   ACCOUNT_ID: 045911161916
+  PATIENT_REPO: patient-service
+  APPOINTMENT_REPO: appointment-service
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -29,17 +27,16 @@ jobs:
 
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region $AWS_REGION | \
-          docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - name: Build and Push patient-service
         working-directory: ./patient-service
         run: |
-          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/patient-service:latest .
-          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/patient-service:latest
+          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:latest .
+          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:latest
 
       - name: Build and Push appointment-service
         working-directory: ./appointment-service
         run: |
-          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/appointment-service:latest .
-          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/appointment-service:latest
+          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$APPOINTMENT_REPO:latest .
+          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$APPOINTMENT_REPO:latest
