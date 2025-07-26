@@ -15,9 +15,10 @@ resource "aws_lb_target_group" "frontend" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
+  target_type = "ip"
 
   health_check {
-    path                = "/"
+    path                = "/health"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
@@ -35,6 +36,7 @@ resource "aws_lb_target_group" "backend" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
+  target_type = "ip"
 
   health_check {
     path                = "/health"
@@ -55,6 +57,7 @@ resource "aws_lb_target_group" "auth" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
+  target_type = "ip"
 
   health_check {
     path                = "/login"
@@ -81,6 +84,38 @@ resource "aws_lb_listener" "http" {
       content_type = "text/plain"
       message_body = "Default ALB response"
       status_code  = "200"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "frontend" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 10
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/patients*", "/health"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "backend" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 20
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/appointments*", "/health"]
     }
   }
 }
