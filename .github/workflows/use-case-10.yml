@@ -1,9 +1,13 @@
-name: Use Case 10
+name: Use Case 10 - Full CI/CD (Docker + Terraform)
 
 on:
   push:
     branches:
       - main
+  
+
+  
+
 env:
   AWS_REGION: ap-south-1
   ECR_REPO_FRONTEND: dev-frontend
@@ -49,7 +53,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.6
-
+3
       - name: Terraform Init
         working-directory: ./use-case-10
         run: terraform init -reconfigure
@@ -69,3 +73,4 @@ jobs:
       - name: Terraform Apply
         working-directory: ./use-case-10
         run: terraform apply -auto-approve tfplan
+
