@@ -1,12 +1,12 @@
-name: Docker Build and Push to ECR
+name: Use Case 10
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'use-case-10/apps/**'
-      - '.github/workflows/use-case-10.yml'
+  
+
+  
 
 env:
   AWS_REGION: ap-south-1
@@ -14,34 +14,62 @@ env:
   ECR_REPO_BACKEND: dev-backend
 
 jobs:
-  docker-build-and-push:
-    name: Build & Push Docker Images
+  build-and-deploy:
+    name: Docker Build & Terraform Deploy
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
-    - name: Checkout source code
-      uses: actions/checkout@v3
+      - name: Checkout source code
+        uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and push frontend image
-      run: |
-        docker build -t $ECR_REPO_FRONTEND:latest ./use-case-10/apps/frontend
-        docker tag $ECR_REPO_FRONTEND:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_FRONTEND:latest
-        docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_FRONTEND:latest
+      - name: Build and push frontend image
+        run: |
+          docker build -t $ECR_REPO_FRONTEND:latest ./use-case-10/apps/frontend
+          docker tag $ECR_REPO_FRONTEND:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_FRONTEND:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_FRONTEND:latest
 
-    - name: Build and push backend image
-      run: |
-        docker build -t $ECR_REPO_BACKEND:latest ./use-case-10/apps/backend
-        docker tag $ECR_REPO_BACKEND:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_BACKEND:latest
-        docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_BACKEND:latest
+      - name: Build and push backend image
+        run: |
+          docker build -t $ECR_REPO_BACKEND:latest ./use-case-10/apps/backend
+          docker tag $ECR_REPO_BACKEND:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_BACKEND:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPO_BACKEND:latest
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        working-directory: ./use-case-10
+        run: terraform init -reconfigure
+
+      - name: Terraform Format
+        working-directory: ./use-case-10
+        run: terraform fmt -recursive
+
+      - name: Terraform Validate
+        working-directory: ./use-case-10
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: ./use-case-10
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ./use-case-10
+        run: terraform apply -auto-approve tfplan
