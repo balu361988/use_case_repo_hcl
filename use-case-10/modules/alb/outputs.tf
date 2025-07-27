@@ -15,10 +15,15 @@ output "tg_backend_arn" {
 }
 
 output "tg_auth_arn" {
-  value = aws_lb_target_group.auth.arn
+  value = aws_lb_target_group.auth_tg.arn
 }
 
 output "alb_listener_arn" {
   value = aws_lb_listener.http.arn
+}
+
+
+output "auth_listener_rule_depends_on" {
+  value = aws_lb_listener_rule.auth_rule
 }
 

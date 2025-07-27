@@ -36,8 +36,8 @@ resource "aws_ecs_task_definition" "frontend" {
 
   container_definitions = jsonencode([
     {
-      name      = "frontend"
-      image     = "${var.ecr_repo_frontend}:latest"
+      name  = "frontend"
+      image = "${var.ecr_repo_frontend}:latest"
       portMappings = [
         {
           containerPort = 3000
@@ -58,8 +58,8 @@ resource "aws_ecs_task_definition" "backend" {
 
   container_definitions = jsonencode([
     {
-      name      = "backend"
-      image     = "${var.ecr_repo_backend}:latest"
+      name  = "backend"
+      image = "${var.ecr_repo_backend}:latest"
       portMappings = [
         {
           containerPort = 3001
@@ -113,4 +113,5 @@ resource "aws_ecs_service" "backend" {
 
   depends_on = [var.alb_listener_arn]
 }
+
 

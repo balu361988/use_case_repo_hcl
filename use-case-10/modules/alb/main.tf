@@ -11,10 +11,10 @@ resource "aws_lb" "app_alb" {
 }
 
 resource "aws_lb_target_group" "frontend" {
-  name     = "${var.environment}-tg-frontend"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name        = "${var.environment}-tg-frontend"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {
@@ -32,10 +32,10 @@ resource "aws_lb_target_group" "frontend" {
 }
 
 resource "aws_lb_target_group" "backend" {
-  name     = "${var.environment}-tg-backend"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name        = "${var.environment}-tg-backend"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {
@@ -53,10 +53,10 @@ resource "aws_lb_target_group" "backend" {
 }
 
 resource "aws_lb_target_group" "auth" {
-  name     = "${var.environment}-tg-auth"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name        = "${var.environment}-tg-auth"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {
@@ -79,7 +79,7 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type             = "fixed-response"
+    type = "fixed-response"
     fixed_response {
       content_type = "text/plain"
       message_body = "Default ALB response"

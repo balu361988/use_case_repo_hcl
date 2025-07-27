@@ -42,3 +42,33 @@ variable "private_subnet_ids" {
   type = list(string)
 }
 
+variable "ecr_repo_auth" {
+  description = "ECR repository URL for auth service"
+  type        = string
+}
+
+variable "tg_auth_arn" {
+  description = "Target group ARN for auth service"
+  type        = string
+}
+
+variable "execution_role_arn" {
+  description = "ECS task execution role ARN for auth container"
+  type        = string
+}
+
+variable "auth_listener_rule_depends_on" {
+  description = "Dependency on listener rule for auth service"
+  type        = any
+}
+
+variable "cluster_id" {
+  description = "ECS Cluster ID"
+  type        = string
+}
+
+variable "ecs_security_group" {
+  description = "Security group for ECS service"
+  type        = string
+}
+

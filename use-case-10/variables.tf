@@ -28,3 +28,13 @@ variable "private_subnet_2_cidr" {
   description = "CIDR block for private subnet 2"
 }
 
+variable "ecr_repo_auth" {
+  description = "ECR repo URL for auth image"
+  type        = string
+}
+
+variable "alert_email" {
+  description = "Email to receive SNS alerts"
+  type        = string
+}
+
