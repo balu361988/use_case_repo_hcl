@@ -38,3 +38,7 @@ variable "alb_listener_arn" {
   type = string
 }
 
+variable "private_subnet_ids" {
+  type = list(string)
+}
+

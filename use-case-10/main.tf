@@ -3,6 +3,8 @@ module "vpc" {
   vpc_cidr             = var.vpc_cidr
   public_subnet_1_cidr = var.public_subnet_1_cidr
   public_subnet_2_cidr = var.public_subnet_2_cidr
+  private_subnet_1_cidr = var.private_subnet_1_cidr
+  private_subnet_2_cidr = var.private_subnet_2_cidr
   region               = var.region
   environment          = var.environment
 }
@@ -62,5 +64,7 @@ module "ecs" {
   tg_backend_arn          = module.alb.tg_backend_arn
   alb_listener_arn        = module.alb.alb_listener_arn
   environment             = var.environment
+  private_subnet_ids      = module.vpc.private_subnet_ids
 }
+
 

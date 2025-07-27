@@ -23,3 +23,13 @@ variable "environment" {
   description = "Environment name (e.g., dev, prod)"
 }
 
+variable "private_subnet_1_cidr" {
+  type        = string
+  description = "CIDR block for private subnet 1"
+}
+
+variable "private_subnet_2_cidr" {
+  type        = string
+  description = "CIDR block for private subnet 2"
+}
+

@@ -78,7 +78,7 @@ resource "aws_ecs_service" "frontend" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = var.public_subnet_ids
+    subnets          = var.private_subnet_ids
     security_groups  = [aws_security_group.ecs_tasks_sg.id]
     assign_public_ip = true
   }
@@ -100,7 +100,7 @@ resource "aws_ecs_service" "backend" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = var.public_subnet_ids
+    subnets          = var.private_subnet_ids
     security_groups  = [aws_security_group.ecs_tasks_sg.id]
     assign_public_ip = true
   }
