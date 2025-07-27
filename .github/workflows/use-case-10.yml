@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'use-case-10/**'
-      - '.github/workflows/use_case_10.yml'
+      - '.github/workflows/use-case-10.yml'
   workflow_dispatch:
 
 env:
