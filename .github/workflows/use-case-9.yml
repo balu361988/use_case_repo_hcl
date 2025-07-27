@@ -1,5 +1,13 @@
 name: Build and Deploy to ECR
 
+on:
+  push:
+    branches:
+      - main-1
+    paths:
+      - 'use-case-7/**'
+      #- '.github/workflows/**'
+
 
 jobs:
   build-and-deploy:
