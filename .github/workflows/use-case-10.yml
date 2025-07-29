@@ -70,5 +70,5 @@ jobs:
 
       - name: Terraform Apply
         working-directory: ./use-case-10
-        run: terraform apply -auto-approve tfplan
+        run: terraform destroy -auto-approve tfplan
 
