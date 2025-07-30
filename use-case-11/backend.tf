@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket  = "myaws-ashok-buckethcl"
-    key     = "uc/terraform.tfstate"
+    bucket  = "usecasebackupfile"
+    key     = "usecase-11-hcl/terraform.tfstate"
     region  = "us-east-1"
   }
 }
