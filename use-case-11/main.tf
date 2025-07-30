@@ -1,6 +1,6 @@
 module "cloudtrail" {
   source      = "./modules/cloudtrail"
-  bucket_name = var.bucket_name        # Just the base name, suffix is added inside module
+  bucket_name = var.bucket_name    
   trail_name  = var.trail_name
 }
 
